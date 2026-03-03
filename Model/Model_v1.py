@@ -46,7 +46,7 @@ class Model_v1(BaseModel):
         pass
 
         ## TODO: Implement the post version of the step
-        
+
         pass
 
     def create_agents(self, n:int, *args, **kwargs):
