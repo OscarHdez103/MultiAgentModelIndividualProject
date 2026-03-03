@@ -114,7 +114,7 @@ class Data:
             agent_df.to_parquet(f"{self.save_path}/Data/agents.parquet")
         if not empty_check(self.graphs_db):
             graph_df = pd.DataFrame([vars(graph) for graph in self.graphs_db])
-            graph_df.to_parquet(f"{self.save_path}/Data/graphs.parquet")
+            graph_df.to_parquet(f"{self.save_path}/Data/graph.parquet")
 
     def opinions_df(self, db):
         # To list of dicts from db
