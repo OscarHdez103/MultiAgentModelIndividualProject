@@ -56,6 +56,6 @@ if __name__ == "__main__":
     # print("Final wealth distribution among agents:", wealth_distribution)
 
     # PREVIOUS MODEL
-    Main(SEED=None).main_model()
+    Main(SEED=42).main_model()
 
 
