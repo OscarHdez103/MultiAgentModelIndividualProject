@@ -6,7 +6,7 @@ class Post:
         self.creator_id :int = creator_id
         self.model :BaseModel = model
         self.interacted_ids :list[int] = [creator_id]
-        self.opinion_tendency :list[float] = opinion_tendency
+        self.opinion_tendency :list[float|None] = opinion_tendency
 
     def propagate(self):
         """Propagate the post to direct neighbours of the interacted agents."""
