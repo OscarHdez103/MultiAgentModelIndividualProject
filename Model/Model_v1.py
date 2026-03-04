@@ -8,6 +8,8 @@ from Database.Data import Data
 from Model.BaseModel import BaseModel
 import matplotlib.pyplot as plt
 
+from Others.Post import Post
+
 
 class Model_v1(BaseModel):
 
@@ -15,6 +17,8 @@ class Model_v1(BaseModel):
         super().__init__(database=database, defined_agent=Agent, n=n, seed=seed, graph=watts_strogatz_graph(n=n, k=k, p=p, seed=seed), opinions=opinions)
         # Choose one random agent
         self.active_rng = np.random.default_rng(seed)
+        self.posts :list[Post] = []
+        self.dead_posts :list[Post] = []
 
         pass
 
@@ -47,12 +51,20 @@ class Model_v1(BaseModel):
 
         ## TODO: Implement the post version of the step
 
+
         pass
 
+    def kill_posts(self):
+        for post in self.posts:
+            if post.is_dead():
+                self.dead_posts.append(post)
+                self.posts.remove(post)
+
+    ## Override create_agents to pass opinions parameter to Agent_v1
     def create_agents(self, n:int, *args, **kwargs):
         """Create agents for the model with parameter in agent innit self.opinions."""
         super().create_agents(n=n, opinions=self.opinions, *args, **kwargs)
-
+    ## Graph visualization method
     def view_graph(self, override_seed:bool = True, seed:float|None=None):
         # From self.graph draw the graph using matplotlib
         if not override_seed:
