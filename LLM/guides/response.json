@@ -1,0 +1,9 @@
+{
+	"reaction": "positive/negative",
+	"opinions_changed": [
+		{
+			"opinion_id": "int of opinion_id in post",
+			"change": "float of how much the opinion has changed from 0.0 to 0.2, always positive."
+		}
+	]
+}

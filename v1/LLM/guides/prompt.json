@@ -1,0 +1,24 @@
+{
+	"agent_info": {
+		"agent_id":"int",
+        "opinions": [
+            {
+                "opinion_id":"int",
+                "bias":"-1 to 1 float"
+            }
+        ]
+	},
+	"friend_ids": [
+		"int",
+        "int"
+	],
+	"post": {
+		"source_id":"int",
+        "opinion_bias": [
+            {
+                "opinion_id":"int",
+                "bias":"-1 to 1 float"
+            }
+        ]
+	}
+}
