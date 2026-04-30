@@ -1,114 +1,76 @@
-import json
-from random import seed
-
-from mesa import Agent
-
+from Agent.Weights import Weights
 from Database.Data import Data
+from Database.DataVariables import DataVariables
 from LLM.RequestLLM import RequestLLM
-from LLM.guides.AgentInfo import AgentInfo
-from LLM.guides.FriendIds import FriendIds
-from LLM.guides.Opinion import Opinion
-from LLM.guides.Post import PostGuide
-from LLM.guides.PromptInfo import PromptInfo
-from Model import *
-from Model import ExampleModel, Model_v1
-from Model.BaseModel import BaseModel
-from Others.Stats import Stats
-
+from Model import Model_v1
 
 class Main:
     def __init__(self,
-            SEED: int|None= 42,
-            STEPS: int = 30,
-            AGENTS: int = 100
-    ):
+                 SEED: int|None= 42,
+                 # STEPS: int = 30,
+                 AGENTS: int = 100,
+                 BOTS: int = 20,
+                 opinion_size: int = 2,
+                 total_steps: int = 1000,
+                 EXTREMIST_BOTS :bool = True,
+                 weight_name :Weights = Weights.BASE,
+                 ):
         """Parameter initialization for the multi-agent model simulation."""
-        self.SEED = SEED
-        self.STEPS: int = STEPS
-        self.AGENTS: int = AGENTS
+        self.variables = DataVariables(
+            SEED=SEED,
+            AGENTS=AGENTS,
+            BOTS=BOTS,
+            opinion_size=opinion_size,
+            total_steps=total_steps,
+            EXTREMIST_BOTS=EXTREMIST_BOTS,
+            weight_name=weight_name,
+            weights=weight_name.get()
+        )
 
-    def example_model_run(self) -> str:
-        """Run the ExampleModel simulation and return the final wealth distribution among agents."""
-        example_model = ExampleModel.ExampleModel(n=self.AGENTS, seed=self.SEED)
-        stats = Stats(example_model)
-        stats.states_str()
-        for i in range(self.STEPS):
-            example_model.step()
-            if i % 3 == 0:
-                print(f"\nStep {i}:")
-                stats.states_str()
-
-        return stats.states_str(state_ids=["wealth"], to_print=False)
 
     def main_model(self):
         llm :RequestLLM = RequestLLM()
 
-        opinion_size:int = 4
-
         # Make save_path the current directory
         save_path = "./"
 
-        db = Data(save_path=save_path, opinion_size=opinion_size)
-        main_model = Model_v1.Model_v1(llm=llm, database=db, opinions=opinion_size, n=self.AGENTS, seed=self.SEED, k=4, p=0.5)
-        main_model.view_graph()
-        for i in range(5):
+        db = Data(save_path=save_path, opinion_size=self.variables.opinion_size, variables=self.variables)
+        main_model = Model_v1.Model_v1(
+            llm=None,
+            database=db,
+            opinions=self.variables.opinion_size,
+            n=self.variables.AGENTS,
+            bots=self.variables.BOTS,
+            seed=self.variables.SEED,
+            k=4, p=0.5,
+            EXTREMIST_BOTS=self.variables.EXTREMIST_BOTS,
+            weights=self.variables.weight_name
+        )
+        # main_model.view_graph()
+        for i in range(self.variables.total_steps):
             print(f"\nStep {i}:")
+            # if i % 10 == 1: print(f"Step {i}:")
             main_model.step()
 
         db.save_parquet()
 
-
-
-
 if __name__ == "__main__":
-    # EXAMPLE MODEL RUN
-    # wealth_distribution = Main().example_model_run()
-    # print("Final wealth distribution among agents:", wealth_distribution)
-
-    # PREVIOUS MODEL
-    Main(SEED=42).main_model()
-
-    # r = RequestLLM()
-    # # # print(r.model)
-    # # print(r.prompt)
-    # # # print(r.response)
-    # #
-    # prompt = PromptInfo(
-    #     agent_info=AgentInfo(
-    #         agent_id=1,
-    #         opinions=[
-    #             Opinion(
-    #                 opinion_id=1,
-    #                 bias=0.5
-    #             ),
-    #             Opinion(
-    #                 opinion_id=2,
-    #                 bias=-0.3
-    #             )
-    #         ]
-    #     ),
-    #     friend_ids=FriendIds(
-    #         friend_ids=[
-    #             2,
-    #             3,
-    #             9
-    #         ]
-    #     ),
-    #     post=PostGuide(
-    #         source_id=9,
-    #         opinion_bias=[
-    #             Opinion(
-    #                 opinion_id=2,
-    #                 bias=0.4
-    #             )
-    #         ]
-    #     )
-    # )
-    # print(prompt)
-    #
-    # text = r.chat(prompt)
-    # # Check if correct json
-    # data = json.loads(text)
-    # print(data)
-    # print(data["opinions_changed"])
+    agents :list[int] = [1000]
+    bots :list[float] = [0, 0.1]
+    weight_types :list[Weights] = [Weights.BASE, Weights.LIED, Weights.FACT]
+    extremist_bots :list[bool] = [False, True]
+    for agent in agents:
+        for bot in bots:
+            for weight_type in weight_types:
+                for extremist_bot in extremist_bots:
+                    if not (extremist_bot and int(agent*bot) <=0):
+                        print(f"Running test for {agent}-{int(agent*bot)} Extremist Bots: {extremist_bot} Weights: {weight_type}")
+                        Main(
+                            SEED=42,
+                            AGENTS=agent-int(agent*bot),
+                            BOTS=int(agent*bot),
+                            EXTREMIST_BOTS=extremist_bot,
+                            weight_name=weight_type
+                        ).main_model()
+    # Main(SEED=None).main_model()
 
