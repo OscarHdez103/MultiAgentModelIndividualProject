@@ -1,0 +1,12 @@
+/.idea
+Agent/__pycache__/ExampleAgent.cpython-313.pyc
+/Agent/__pycache__
+Agent/__pycache__/BaseAgent.cpython-313.pyc
+Data/graphs.parquet
+Data/agents.parquet
+*.pyc
+
+
+Data/graph.parquet
+Model/__pycache__/ExampleModel.cpython-313.pyc
+*.pyc

@@ -1,0 +1,9 @@
+{
+	"SEED": 13,
+	"AGENTS": 1000,
+	"BOTS": 0,
+	"opinion_size": 2,
+	"total_steps": 1000,
+	"EXTREMIST_BOTS": false,
+	"weight_name": "Lied"
+}
